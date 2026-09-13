@@ -1,27 +1,39 @@
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
-fn main(){
+// fn main(){    
 
-    let scores: HashMap<String, u32> = HashMap::new();
+//     let mut scores: HashMap<String, u32> = HashMap::new();
 
+//     scores.insert(String::from("Chinedu"), 78);
+//     scores.insert(String::from("Michael"), 92);
+//     scores.insert(String::from("John"), 85);
+//     scores.insert(String::from("David"), 88);
+    
+//     let highest_score = highest(&scores);
 
-
-
-}
-
-fn highest(scores: HashMap<String, u32>) -> String{
-
-    if scores.is_empty(){
-        return "".to_string()
-    }
+//     println!("The highest score is: {}", highest_score);
 
 
-    for pair in scores {
-        
-    }
+// }
+
+// fn highest(scores: &HashMap<String, u32>) -> String{
+
+//     if scores.is_empty(){
+//         return "".to_string()
+//     }
+
+//     let highest_score = scores.values().max().unwrap();
+
+//     for (name, score) in scores{
+//         if *score == *highest_score{
+//             return name.clone()
+//         } 
+//     }
+
+//     return "".to_string();
 
 
-}
+// }
 
 
 // fn main() {
