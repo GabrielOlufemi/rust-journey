@@ -1,6 +1,5 @@
 use std::{clone, collections::HashMap, hash::Hash};
-
-use crate::Status::Finished;
+use std::env::args;
 
 #[derive(Debug)]
 struct ToDoApp {
@@ -9,7 +8,6 @@ struct ToDoApp {
     next_id: u32
 
 }
-
 
 impl ToDoApp {
     fn add_task (&mut self, title: String, desc: String, due_date: String, priority: Priority, status: Status) {
@@ -99,64 +97,88 @@ enum Priority {
 
 fn main() { 
 
+    let mut app = ToDoApp{
+        tasks: HashMap::new(),
+        order: Vec::new(),
+        next_id: 1,
+    };
 
-    let v = vec![
-        Task {
-            id: 1,
-            title: String::from("Task 1"),
-            desc: String::from("Description for Task 1"),
-            due_date: String::from("2023-12-31"),
-            priority: Priority::High,
-            status: Status::NotStarted
+
+
+
+
+    // reading task type
+    let command = args().skip(1).next();
+
+
+    // read task argument
+    let cmd_arg = args().skip(2).next();
+
+
+    match command {
+        Some(cmd) => {
+            match cmd.as_str() {
+                "add" => {
+                            println!("add called");
+
+                            match cmd_arg {
+
+                                Some(title) => {
+                                    app.add_task(title.clone(), String::new(), String::new(), Priority::Low, Status::NotStarted);
+                                   
+                                    println!("title received: {}", title)
+                                
+                                },
+                                None => println!("no argument provided")
+
+                            }
+                        },
+                "remove" => {
+                            println!("remove called");
+
+                            match cmd_arg {
+                                Some(id_str) => {
+                                    match id_str.parse::<u32>() {
+                                        Ok(id) => app.remove_task(id),
+                                        Err(_) => println!("invalid id: nan")
+                                    }
+                                },
+                                None => println!("no argument provided")
+                            }
+                        },
+                "list" => {
+                            println!("list called");
+
+                            let task_list = app.list_tasks();
+
+                            for item in task_list {
+                                println!("{:?}", item);
+                            }
+                        }
+                "complete" => {
+                                println!("complete called");
+                                
+                                match cmd_arg {
+                                    Some(id_str) => {
+                                        match id_str.parse::<u32>() {
+                                            Ok(id) => {
+                                                app.complete_task(id);
+                                            },
+                                            Err(_) => println!("invalid id: nan")
+                                        }
+                                    },
+                                    None => println!("no arugment provided")
+                                }
+                            },
+
+                _ => println!("unrecognized command: {cmd}")
+            }
         },
-        Task {
-            id: 2,
-            title: String::from("Task 2"),
-            desc: String::from("Description for Task 2"),
-            due_date: String::from("2023-11-30"),
-            priority: Priority::Medium,
-            status: Status::InProgress
-        },
-        Task {
-            id: 3,
-            title: String::from("Task 3"),
-            desc: String::from("Description for Task 3"),
-            due_date: String::from("2023-10-15"),
-            priority: Priority::Low,
-            status: Status::Finished
-        },
-        Task {
-            id: 4,
-            title: String::from("Task 4"),
-            desc: String::from("Description for Task 4"),
-            due_date: String::from("2023-10-15"),
-            priority: Priority::Low,
-            status: Status::NotStarted
-        }
-    ];
+        None => println!("no command provided")
+    }
 
 
-    let result = count_tasks(&v);
 
-
-    println!("{result:#?}");
-
-    let grouped_tasks = group_tasks(&v);
-
-    println!("Grouped tasks p");
-    println!("{grouped_tasks:#?}");
-
-    let grouped_id_tasks = group_by_id(&v);
-
-    println!("Grouped tasks by id");
-    println!("{grouped_id_tasks:#?}");
-
-
-    // search for id in vector
-    let search_id = 2;
-
-    let found = id_in_vector(&v, &search_id);
-    println!("{found:#?}");
 
 }
 
@@ -174,7 +196,6 @@ fn group_by_id(tasks: &Vec<Task>) -> HashMap<u32, Vec<Task>> {
     map
 
 }
-
 
 fn find_by_id(tasks: &HashMap<u32, Task>, id:u32) -> Option<&Task> {
 
