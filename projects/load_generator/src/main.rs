@@ -8,6 +8,7 @@ use std::time::{Duration, Instant};
 // use std::sync::atomic::{Ordering, AtomicU32};
 
 use tokio::sync::mpsc;
+use tokio::time::interval;
 
 use report::print_report;
 use workers::{RequestOutcome, send_request};
@@ -22,26 +23,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let url = "http://127.0.0.1:8002/";
 
-
     let start = Instant::now();
-    let outcomes = spawn_requests(&client, url, Duration::from_secs(5), 50).await;
+    let outcomes = spawn_requests(&client, url, 100, Duration::from_secs(5)).await;
     let wall_clock = start.elapsed();
 
     let summary = summarise(&outcomes, wall_clock);
 
     print_report(&summary);
     
-    
     Ok(())
 
 
 }
 
-async fn spawn_requests(client: &Client, url: &str, duration: Duration, concurrency: u32) -> Vec<RequestOutcome>{
+async fn spawn_requests(client: &Client, url: &str, rate: u32, duration: Duration) -> Vec<RequestOutcome>{
 
     // deprecated sort of like a "shared ticket counter" - based off my understanding sha
     // let next_ticket = Arc::new(AtomicU32::new(0));
+
+    // deadline based off duration
     let deadline = Instant::now() + duration;
+
+    // interval
+    let period = Duration::from_secs_f64(1.0 / rate as f64);
+
+    let mut ticker = interval(period); 
     
 
     //our channel, multiple senders, one receiver - our aggregator
@@ -55,66 +61,61 @@ async fn spawn_requests(client: &Client, url: &str, duration: Duration, concurre
         }
         outcomes
     });
-    
-    // workers handle store
-    let mut handles = Vec::new();
 
-    for _ in 0..concurrency {
+    // new dispatch loop    
+    while Instant::now() < deadline {
+        ticker.tick().await;
+
         let client = client.clone();
         let url = url.to_string();
-        // let next_ticket = Arc::clone(&next_ticket);
         let tx = tx.clone();
 
-        // satrt worker
-        let handle = tokio::spawn(async move {
+        tokio::spawn(async move {
+            let outcome = send_request(&client, &url).await;
 
-            // checks if deadline is elapsed before executing task
-            while Instant::now() < deadline {
-
-                // send request and store outcome
-                let outcome = send_request(&client, &url).await;
-
-                // send outcome to aggregator
-                if tx.send(outcome).await.is_err() {
-                    break;
-                }
-            }
-
+            // sort of a "ik this returns a result but idc" 
+            let _ = tx.send(outcome).await;
+            
         });
 
-        handles.push(handle);
+        
     }
+    
+    // workers handle store
+    // let mut handles = Vec::new();
+
+    // for _ in 0..concurrency {
+    //     let client = client.clone();
+    //     let url = url.to_string();
+    //     // let next_ticket = Arc::clone(&next_ticket);
+    //     let tx = tx.clone();
+
+    //     // satrt worker
+    //     let handle = tokio::spawn(async move {
+
+    //         // checks if deadline is elapsed before executing task
+    //         while Instant::now() < deadline {
+
+    //             // send request and store outcome
+    //             let outcome = send_request(&client, &url).await;
+
+    //             // send outcome to aggregator
+    //             if tx.send(outcome).await.is_err() {
+    //                 break;
+    //             }
+    //         }
+
+    //     });
+
+    //     handles.push(handle);
+    // }
 
     drop(tx);
-
-    for handle in handles {
-        // 
-        handle.await.expect("worker task panicked");
-    }
-
 
     aggregator.await.expect("aggregator task panicked")
     
 }
 
-async fn spam_requests(client: &reqwest::Client, url: &str, count: &u32) -> Vec<RequestOutcome> {
-
-    let mut i = 1;
-    let mut outcomes = Vec::new();
-
-    while &i <= count {
-
-        let outcome = send_request(&client, &url).await;
-
-        println!("request {i}: {:?}", outcome.latency);
-        
-        outcomes.push(outcome);
-        i+= 1;
-    }
-
-    outcomes
-
-}
 
 
 
