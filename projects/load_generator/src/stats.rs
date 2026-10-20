@@ -17,7 +17,6 @@ pub struct Summary {
   pub p99: Duration,
   pub timeouts: usize,
   pub connection_failures: usize,
-  pub status_codes: BTreeMap<u16, usize>,
   pub failure_reasons: BTreeMap<String, usize>,
 }
 
