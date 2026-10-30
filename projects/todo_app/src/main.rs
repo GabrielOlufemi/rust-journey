@@ -124,10 +124,10 @@ fn main() {
                             match cmd_arg {
 
                                 Some(title) => {
-                                    app.add_task(title.clone(), String::new(), String::new(), Priority::Low, Status::NotStarted);
-                                   
-                                    println!("title received: {}", title)
-                                
+                                    println!("title received: {}", title);
+
+                                    app.add_task(title, String::new(), String::new(), Priority::Low, Status::NotStarted);
+                                                                   
                                 },
                                 None => println!("no argument provided")
 
@@ -184,13 +184,13 @@ fn main() {
 
 // group by id
 
-fn group_by_id(tasks: &Vec<Task>) -> HashMap<u32, Vec<Task>> {
+fn group_by_id(tasks: &mut Vec<Task>) -> HashMap<u32, Vec<&mut Task>> {
 
     let mut map = HashMap::new();
 
     for task in tasks {
         let category = map.entry(task.id).or_insert(vec![]);
-        category.push(task.clone());
+        category.push(task);
     }
 
     map
@@ -210,7 +210,7 @@ fn id_in_vector<'a>(tasks: &'a Vec<Task>, id:&u32) -> Option<&'a Task> {
             return Some(task)
         }
     }
-
+    
     None
 }
 
@@ -228,7 +228,7 @@ fn count_tasks(tasks: &Vec<Task>) -> HashMap<Status, u32> {
 
 }
 
-fn group_tasks(tasks: &Vec<Task>) -> HashMap<Status, Vec<Task>>{
+fn group_tasks(tasks: &Vec<Task>) -> HashMap<Status, Vec<&Task>>{
 
     let mut map = HashMap::new();
 
@@ -236,7 +236,7 @@ fn group_tasks(tasks: &Vec<Task>) -> HashMap<Status, Vec<Task>>{
 
             let grouped = map.entry(task.status).or_insert(vec![]);
 
-            grouped.push(task.clone());
+            grouped.push(task);
     }
 
     map
