@@ -1,61 +1,118 @@
-use std::vec;
-
-fn count_words(s: &String) -> usize{
-
-    let mut word = String::new();
-    let mut words: Vec<String> = Vec::new();
-
-    for char in s.chars() {
-
-        if char.is_whitespace(){
-            if !word.is_empty(){
-                words.push(std::mem::take(&mut word));
-            }
-
-        } else {
-            word.push(char);
-        }
-    }
-
-    if !word.is_empty(){
-        words.push(word);
-    }
-
-    words.len()
+struct player {
+    name: String, 
+    score: i32 
 }
 
 
-fn truncate(s: &String, stop: u32) -> String {
-
-    let mut word = String::new();
-
-    if stop == 0{
-        return word
-    }
-
-    for (index, char ) in s.chars().enumerate() {
-        word.push(char);
 
 
-        if index == (stop-1) as usize {
-            return word
-        }   
-    }
+// struct User<T> {
+//     name: T
+// }
 
-    word
-}
+// impl<T> User<T> {
+//     fn get_name(&self) -> &T{
+//         &self.name
+//     }
+// } 
+
+// impl<T> Point<T>
+
+// where T: std::fmt::Display,
+// {
+//     fn printresult(&self) {
+//         println!("This is a {}", self.result)
+//     }
+    
+// }
+
+// fn main() {
+//     let new_point = Point {
+//         result : String::from("chinedu")
+//     };
+
+//     new_point.printresult();
+// }
+
+// struct Point { x: i32, y: i32 }
+
+// fn main() {
+//     let p1 = Point { x: 1, y: 2 };
+//     let p2 = &p1;
+//     println!("{}", p1.x);
+// }
 
 
-fn main() {
+// fn multiply<'a>(a: &'a i32, b: &'a i32) -> i32 {
 
-    let example = "   I love me some fishes".to_string();
+//     *a * *b
 
-    let result = count_words(&example);
+// }
 
-    println!("no of words is {}", result);
+// fn returnIndex<'a>(scores: &'a List[i32], index: i32) -> &'a String {
+
+//     sentence.as_str()[index as usize]
+
+// }
+
+// use std::vec;
+
+// fn count_words(s: &String) -> usize{
+
+//     let mut word = String::new();
+//     let mut words: Vec<String> = Vec::new();
+
+//     for char in s.chars() {
+
+//         if char.is_whitespace(){
+//             if !word.is_empty(){
+//                 words.push(std::mem::take(&mut word));
+//             }
+
+//         } else {
+//             word.push(char);
+//         }
+//     }
+
+//     if !word.is_empty(){
+//         words.push(word);
+//     }
+
+//     words.len()
+// }
 
 
-}
+// fn truncate(s: &String, stop: u32) -> String {
+
+//     let mut word = String::new();
+
+//     if stop == 0{
+//         return word
+//     }
+
+//     for (index, char ) in s.chars().enumerate() {
+//         word.push(char);
+
+
+//         if index == (stop-1) as usize {
+//             return word
+//         }   
+//     }
+
+//     word
+// }
+
+
+// fn main() {
+
+//     let example = "   I love me some fishes".to_string();
+
+//     let result = count_words(&example);
+
+//     println!("no of words is {}", result);
+
+
+// }
 
 
 
@@ -128,4 +185,4 @@ fn main() {
 
 // // Whether it compiles. If it doesn't, name the line and the rule being broken, using "owner" and "moved".
 // // Two different fixes that use different tools. One of them shouldn't be .clone(). Tell me which you'd choose.
-// // If data were let data = 5; and consume took an i32, would it compile? Why is that different?
+// // If data were let data = 5; and consume took an i32, would it compile? Why is that different
